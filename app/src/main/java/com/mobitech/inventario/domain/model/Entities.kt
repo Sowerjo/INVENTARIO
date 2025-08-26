@@ -120,3 +120,58 @@ data class ProductListLayoutEntity(
     val qtyKey: String = "quantidade",
     val updatedAt: Long = System.currentTimeMillis()
 )
+
+// Configuração de Inventário (template reutilizável)
+@Entity(tableName = "inventory_configs")
+data class InventoryConfigEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val isDefault: Boolean = false,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis()
+)
+
+// Aba A: Mapeamento de Campos
+@Entity(tableName = "field_mapping_configs")
+data class FieldMappingConfigEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val configId: Long,
+    val idKey: String, // OBRIGATÓRIO - campo que identifica unicamente o produto
+    val expectedQtyField: String? = null, // campo da base que representa o estoque esperado
+    val updateQtyField: String? = null, // campo que será atualizado no fechamento
+    val updateMode: UpdateMode = UpdateMode.OVERWRITE, // OVERWRITE ou DELTA
+    val readAsString: Boolean = true // sempre ler células como STRING
+)
+
+// Aba B: Busca & Leitura
+@Entity(tableName = "search_configs")
+data class SearchConfigEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val configId: Long,
+    val scanKey: String, // campo que o scanner/pesquisa usa
+    val filterKeys: String, // JSON array de campos pesquisáveis
+    val normalizeSearch: Boolean = true, // case-insensitive, ignorar espaços/hífens
+    val incrementOnScan: Boolean = true // somar +1 automático ou abrir numpad
+)
+
+// Aba C: Layout do Card
+@Entity(tableName = "card_layout_configs")
+data class CardLayoutConfigEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val configId: Long,
+    val line1Key: String, // campo mostrado na Linha 1 (título, negrito)
+    val line2Keys: String, // JSON array ≤2 campos na Linha 2
+    val line3Keys: String, // JSON array ≤2 campos na Linha 3
+    val qtyKey: String, // campo mostrado/alterado na coluna direita
+    val showExpected: Boolean = true, // mostrar quantidade esperada
+    val quickSteps: String // JSON array de botões rápidos (ex: [-1, 1, 5, 10])
+)
+
+// Aba D: Regras de Criação
+@Entity(tableName = "creation_rules_configs")
+data class CreationRulesConfigEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val configId: Long,
+    val scopeCategory: String? = null, // filtrar por categoria ou usar todos
+    val inputMode: InputMode = InputMode.ACCUMULATE // ACCUMULATE ou OVERWRITE
+)

@@ -33,7 +33,8 @@ fun AppNavHost() {
                 state = vm.state,
                 onEvent = vm::onEvent,
                 onOpen = { id -> nav.navigate("inventario/detail/$id") },
-                onBack = { nav.popBackStack() }
+                onBack = { nav.popBackStack() },
+                onOpenConfig = { nav.navigate(NavRoutes.INVENTORY_CONFIG) }
             )
         }
         composable(
@@ -46,6 +47,11 @@ fun AppNavHost() {
             InventoryDetailScreen(
                 state = vm.state,
                 onEvent = vm::onEvent,
+                onBack = { nav.popBackStack() }
+            )
+        }
+        composable(NavRoutes.INVENTORY_CONFIG) {
+            InventoryConfigScreen(
                 onBack = { nav.popBackStack() }
             )
         }

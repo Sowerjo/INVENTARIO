@@ -141,6 +141,78 @@ interface ProductListLayoutDao {
     suspend fun updateQtyKey(qtyKey: String, updatedAt: Long = System.currentTimeMillis())
 }
 
+@Dao
+interface InventoryConfigDao {
+    @Query("SELECT * FROM inventory_configs ORDER BY createdAt DESC")
+    fun observeAll(): Flow<List<InventoryConfigEntity>>
+
+    @Query("SELECT * FROM inventory_configs WHERE id = :id")
+    suspend fun getById(id: Long): InventoryConfigEntity?
+
+    @Query("SELECT * FROM inventory_configs WHERE isDefault = 1 LIMIT 1")
+    suspend fun getDefault(): InventoryConfigEntity?
+
+    @Insert
+    suspend fun insert(config: InventoryConfigEntity): Long
+
+    @Update
+    suspend fun update(config: InventoryConfigEntity)
+
+    @Delete
+    suspend fun delete(config: InventoryConfigEntity)
+
+    @Query("UPDATE inventory_configs SET isDefault = 0")
+    suspend fun clearAllDefaults()
+}
+
+@Dao
+interface FieldMappingConfigDao {
+    @Query("SELECT * FROM field_mapping_configs WHERE configId = :configId")
+    suspend fun getByConfigId(configId: Long): FieldMappingConfigEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(config: FieldMappingConfigEntity)
+
+    @Delete
+    suspend fun delete(config: FieldMappingConfigEntity)
+}
+
+@Dao
+interface SearchConfigDao {
+    @Query("SELECT * FROM search_configs WHERE configId = :configId")
+    suspend fun getByConfigId(configId: Long): SearchConfigEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(config: SearchConfigEntity)
+
+    @Delete
+    suspend fun delete(config: SearchConfigEntity)
+}
+
+@Dao
+interface CardLayoutConfigDao {
+    @Query("SELECT * FROM card_layout_configs WHERE configId = :configId")
+    suspend fun getByConfigId(configId: Long): CardLayoutConfigEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(config: CardLayoutConfigEntity)
+
+    @Delete
+    suspend fun delete(config: CardLayoutConfigEntity)
+}
+
+@Dao
+interface CreationRulesConfigDao {
+    @Query("SELECT * FROM creation_rules_configs WHERE configId = :configId")
+    suspend fun getByConfigId(configId: Long): CreationRulesConfigEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(config: CreationRulesConfigEntity)
+
+    @Delete
+    suspend fun delete(config: CreationRulesConfigEntity)
+}
+
 class EnumConverters {
     @TypeConverter fun roleToString(v: UserRole) = v.name
     @TypeConverter fun stringToRole(v: String) = UserRole.valueOf(v)
@@ -154,4 +226,8 @@ class EnumConverters {
     @TypeConverter fun stringToBackupType(v: String) = BackupType.valueOf(v)
     @TypeConverter fun conferenceModeToString(v: ConferenceMode) = v.name
     @TypeConverter fun stringToConferenceMode(v: String) = ConferenceMode.valueOf(v)
+    @TypeConverter fun updateModeToString(v: UpdateMode) = v.name
+    @TypeConverter fun stringToUpdateMode(v: String) = UpdateMode.valueOf(v)
+    @TypeConverter fun inputModeToString(v: InputMode) = v.name
+    @TypeConverter fun stringToInputMode(v: String) = InputMode.valueOf(v)
 }

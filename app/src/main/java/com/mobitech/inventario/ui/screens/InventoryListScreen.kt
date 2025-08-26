@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,13 +27,23 @@ fun InventoryListScreen(
     state: InventoryListState,
     onEvent: (InventoryListEvent) -> Unit,
     onOpen: (Long) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenConfig: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Inventários") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Voltar") } }
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Voltar")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onOpenConfig) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Configurações")
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -90,7 +101,8 @@ private fun InventoryListScreenPreview() {
             state = InventoryListState(inventories = sample, name = "Novo Inventário", note = "Observação"),
             onEvent = {},
             onOpen = {},
-            onBack = {}
+            onBack = {},
+            onOpenConfig = {}
         )
     }
 }

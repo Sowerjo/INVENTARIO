@@ -1,7 +1,7 @@
 package com.mobitech.inventario.di
 
 import android.app.Application
-import com.mobitech.inventario.data.local.AppDatabase
+import com.mobitech.inventario.data.local.*
 import com.mobitech.inventario.data.repository.*
 import com.mobitech.inventario.domain.repository.*
 import com.mobitech.inventario.domain.usecase.*
@@ -30,15 +30,27 @@ object AppModule {
     @Provides fun provideCategoryDao(db: AppDatabase) = db.categoryDao()
     @Provides fun provideProductAttributeDao(db: AppDatabase) = db.productAttributeDao()
     @Provides fun provideProductListLayoutDao(db: AppDatabase) = db.productListLayoutDao()
+    @Provides fun provideInventoryConfigDao(db: AppDatabase) = db.inventoryConfigDao()
+    @Provides fun provideFieldMappingConfigDao(db: AppDatabase) = db.fieldMappingConfigDao()
+    @Provides fun provideSearchConfigDao(db: AppDatabase) = db.searchConfigDao()
+    @Provides fun provideCardLayoutConfigDao(db: AppDatabase) = db.cardLayoutConfigDao()
+    @Provides fun provideCreationRulesConfigDao(db: AppDatabase) = db.creationRulesConfigDao()
 
-    @Provides @Singleton fun provideUserRepo(userDao: com.mobitech.inventario.data.local.UserDao): UserRepository = UserRepositoryImpl(userDao)
-    @Provides @Singleton fun provideCategoryRepo(categoryDao: com.mobitech.inventario.data.local.CategoryDao): CategoryRepository = CategoryRepositoryImpl(categoryDao)
-    @Provides @Singleton fun provideProductRepo(app: Application, productDao: com.mobitech.inventario.data.local.ProductDao, categoryDao: com.mobitech.inventario.data.local.CategoryDao, productAttributeDao: com.mobitech.inventario.data.local.ProductAttributeDao): ProductRepository = ProductRepositoryImpl(productDao, app, categoryDao, productAttributeDao)
-    @Provides @Singleton fun provideInventoryRepo(inventoryDao: com.mobitech.inventario.data.local.InventoryDao): InventoryRepository = InventoryRepositoryImpl(inventoryDao)
-    @Provides @Singleton fun provideInventoryItemRepo(iiDao: com.mobitech.inventario.data.local.InventoryItemDao, productDao: com.mobitech.inventario.data.local.ProductDao): InventoryItemRepository = InventoryItemRepositoryImpl(iiDao, productDao)
+    @Provides @Singleton fun provideUserRepo(userDao: UserDao): UserRepository = UserRepositoryImpl(userDao)
+    @Provides @Singleton fun provideCategoryRepo(categoryDao: CategoryDao): CategoryRepository = CategoryRepositoryImpl(categoryDao)
+    @Provides @Singleton fun provideProductRepo(app: Application, productDao: ProductDao, categoryDao: CategoryDao, productAttributeDao: ProductAttributeDao): ProductRepository = ProductRepositoryImpl(productDao, app, categoryDao, productAttributeDao)
+    @Provides @Singleton fun provideInventoryRepo(inventoryDao: InventoryDao): InventoryRepository = InventoryRepositoryImpl(inventoryDao)
+    @Provides @Singleton fun provideInventoryItemRepo(iiDao: InventoryItemDao, productDao: ProductDao): InventoryItemRepository = InventoryItemRepositoryImpl(iiDao, productDao)
     @Provides @Singleton fun provideCsvExportRepo(app: Application): CsvExportRepository = CsvExportRepositoryImpl(app)
-    @Provides @Singleton fun provideSettingsRepo(settingsDao: com.mobitech.inventario.data.local.SettingsDao): SettingsRepository = SettingsRepositoryImpl(settingsDao)
-    @Provides @Singleton fun provideProductListLayoutRepo(layoutDao: com.mobitech.inventario.data.local.ProductListLayoutDao, categoryDao: com.mobitech.inventario.data.local.CategoryDao): ProductListLayoutRepository = ProductListLayoutRepositoryImpl(layoutDao, categoryDao)
+    @Provides @Singleton fun provideSettingsRepo(settingsDao: SettingsDao): SettingsRepository = SettingsRepositoryImpl(settingsDao)
+    @Provides @Singleton fun provideProductListLayoutRepo(layoutDao: ProductListLayoutDao, categoryDao: CategoryDao): ProductListLayoutRepository = ProductListLayoutRepositoryImpl(layoutDao, categoryDao)
+    @Provides @Singleton fun provideInventoryConfigRepo(
+        configDao: InventoryConfigDao,
+        fieldMappingDao: FieldMappingConfigDao,
+        searchConfigDao: SearchConfigDao,
+        cardLayoutDao: CardLayoutConfigDao,
+        creationRulesDao: CreationRulesConfigDao
+    ): InventoryConfigRepository = InventoryConfigRepositoryImpl(configDao, fieldMappingDao, searchConfigDao, cardLayoutDao, creationRulesDao)
 
     // UseCases
     @Provides fun provideLoginUC(userRepo: UserRepository) = LoginUserUseCase(userRepo)
@@ -63,4 +75,8 @@ object AppModule {
     @Provides fun provideUpdateProductListLayoutUC(layoutRepo: ProductListLayoutRepository) = UpdateProductListLayoutUseCase(layoutRepo)
     @Provides fun provideGetAvailableLayoutKeysUC(layoutRepo: ProductListLayoutRepository) = GetAvailableLayoutKeysUseCase(layoutRepo)
     @Provides fun provideSuggestLayoutDefaultsUC(layoutRepo: ProductListLayoutRepository) = SuggestLayoutDefaultsUseCase(layoutRepo)
+    @Provides fun provideSaveInventoryConfigUC(repo: InventoryConfigRepository) = SaveInventoryConfigUseCase(repo)
+    @Provides fun provideLoadInventoryConfigUC(repo: InventoryConfigRepository) = LoadInventoryConfigUseCase(repo)
+    @Provides fun provideDeleteInventoryConfigUC(repo: InventoryConfigRepository) = DeleteInventoryConfigUseCase(repo)
+    @Provides fun provideObserveInventoryConfigsUC(repo: InventoryConfigRepository) = ObserveInventoryConfigsUseCase(repo)
 }

@@ -1,4 +1,4 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.mobitech.inventario.ui.screens
 
 import android.content.Intent
@@ -146,8 +146,29 @@ private fun ImportSection(
                         if (state.importing) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp) else Text("Importar +")
                     }
                     Button(onClick = { onEvent(ProductListEvent.ImportOverwrite) }, enabled = !state.importing && state.xlsxFileName != null) { Text("Sobrescrever") }
-                    OutlinedButton(onClick = onExportFile, enabled = !state.exporting) {
-                        if (state.exporting) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp) else Text("Exportar XLSX")
+                    OutlinedButton(
+                        onClick = onExportFile,
+                        enabled = !state.exporting,
+                        modifier = Modifier.height(40.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (state.exporting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Filled.FileDownload,
+                                    contentDescription = "Exportar",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Text("Exportar XLSX")
+                        }
                     }
                 }
 

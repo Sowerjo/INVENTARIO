@@ -403,3 +403,70 @@ class ProductListLayoutRepositoryImpl(
         )
     }
 }
+
+class InventoryConfigRepositoryImpl(
+    private val configDao: InventoryConfigDao,
+    private val fieldMappingDao: FieldMappingConfigDao,
+    private val searchConfigDao: SearchConfigDao,
+    private val cardLayoutDao: CardLayoutConfigDao,
+    private val creationRulesDao: CreationRulesConfigDao
+) : InventoryConfigRepository {
+
+    override fun observeAll(): Flow<List<InventoryConfigEntity>> = configDao.observeAll()
+
+    override suspend fun getById(id: Long): InventoryConfigEntity? = configDao.getById(id)
+
+    override suspend fun getDefault(): InventoryConfigEntity? = configDao.getDefault()
+
+    override suspend fun save(
+        config: InventoryConfigEntity,
+        fieldMapping: FieldMappingConfigEntity,
+        searchConfig: SearchConfigEntity,
+        cardLayout: CardLayoutConfigEntity,
+        creationRules: CreationRulesConfigEntity
+    ): Result<Long> = resultOf {
+        // Se for marcado como padrão, desmarcar outros
+        if (config.isDefault) {
+            configDao.clearAllDefaults()
+        }
+
+        // Salvar a configuração principal
+        val configId = if (config.id == 0L) {
+            configDao.insert(config.copy(updatedAt = System.currentTimeMillis()))
+        } else {
+            configDao.update(config.copy(updatedAt = System.currentTimeMillis()))
+            config.id
+        }
+
+        // Salvar as configurações específicas
+        fieldMappingDao.insert(fieldMapping.copy(configId = configId))
+        searchConfigDao.insert(searchConfig.copy(configId = configId))
+        cardLayoutDao.insert(cardLayout.copy(configId = configId))
+        creationRulesDao.insert(creationRules.copy(configId = configId))
+
+        configId
+    }
+
+    override suspend fun load(id: Long): Result<CompleteInventoryConfig> = resultOf {
+        val config = configDao.getById(id) ?: throw Exception("Configuração não encontrada")
+        val fieldMapping = fieldMappingDao.getByConfigId(id)
+        val searchConfig = searchConfigDao.getByConfigId(id)
+        val cardLayout = cardLayoutDao.getByConfigId(id)
+        val creationRules = creationRulesDao.getByConfigId(id)
+
+        CompleteInventoryConfig(config, fieldMapping, searchConfig, cardLayout, creationRules)
+    }
+
+    override suspend fun delete(id: Long): Result<Unit> = resultOf {
+        val config = configDao.getById(id) ?: throw Exception("Configuração não encontrada")
+
+        // Deletar configurações específicas
+        fieldMappingDao.getByConfigId(id)?.let { fieldMappingDao.delete(it) }
+        searchConfigDao.getByConfigId(id)?.let { searchConfigDao.delete(it) }
+        cardLayoutDao.getByConfigId(id)?.let { cardLayoutDao.delete(it) }
+        creationRulesDao.getByConfigId(id)?.let { creationRulesDao.delete(it) }
+
+        // Deletar configuração principal
+        configDao.delete(config)
+    }
+}

@@ -23,10 +23,15 @@ import at.favre.lib.crypto.bcrypt.BCrypt
         SettingsEntity::class,
         CategoryEntity::class,
         ProductAttributeEntity::class,
-        ProductListLayoutEntity::class
+        ProductListLayoutEntity::class,
+        InventoryConfigEntity::class,
+        FieldMappingConfigEntity::class,
+        SearchConfigEntity::class,
+        CardLayoutConfigEntity::class,
+        CreationRulesConfigEntity::class
     ],
-    version = 6,
-    exportSchema = true
+    version = 2,
+    exportSchema = false
 )
 @TypeConverters(EnumConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -41,6 +46,11 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun productAttributeDao(): ProductAttributeDao
     abstract fun productListLayoutDao(): ProductListLayoutDao
+    abstract fun inventoryConfigDao(): InventoryConfigDao
+    abstract fun fieldMappingConfigDao(): FieldMappingConfigDao
+    abstract fun searchConfigDao(): SearchConfigDao
+    abstract fun cardLayoutConfigDao(): CardLayoutConfigDao
+    abstract fun creationRulesConfigDao(): CreationRulesConfigDao
 
     companion object {
         fun build(context: Context, scope: CoroutineScope): AppDatabase =

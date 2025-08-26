@@ -79,3 +79,26 @@ interface ProductListLayoutRepository {
     suspend fun getAvailableKeys(): Result<List<String>>
     suspend fun suggestDefaults(availableKeys: List<String>): ProductListLayoutEntity
 }
+
+interface InventoryConfigRepository {
+    fun observeAll(): Flow<List<InventoryConfigEntity>>
+    suspend fun getById(id: Long): InventoryConfigEntity?
+    suspend fun getDefault(): InventoryConfigEntity?
+    suspend fun save(
+        config: InventoryConfigEntity,
+        fieldMapping: FieldMappingConfigEntity,
+        searchConfig: SearchConfigEntity,
+        cardLayout: CardLayoutConfigEntity,
+        creationRules: CreationRulesConfigEntity
+    ): Result<Long>
+    suspend fun load(id: Long): Result<CompleteInventoryConfig>
+    suspend fun delete(id: Long): Result<Unit>
+}
+
+data class CompleteInventoryConfig(
+    val config: InventoryConfigEntity,
+    val fieldMapping: FieldMappingConfigEntity?,
+    val searchConfig: SearchConfigEntity?,
+    val cardLayout: CardLayoutConfigEntity?,
+    val creationRules: CreationRulesConfigEntity?
+)
